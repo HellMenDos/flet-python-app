@@ -1,15 +1,44 @@
 import flet as ft
-from widgets import add_topic 
+from comp.card import card_comp
 
 def index(page: ft.Page):
-    dlg = add_topic.add_topic_modal(page)
+    title = ft.TextField(label="Название")
+    desc = ft.TextField(label="Описание")
+    
+    async def create_topic(e):
+        chat.controls.append(card_comp(page, title.value, desc.value))
 
+        title.value = ''
+        desc.value = ''
+        dlg.open = False
+        await e.control.page.update_async()
+    
     async def open_dlg(e):
         e.control.page.dialog = dlg
         dlg.open = True
         await e.control.page.update_async()
-            
-    
+                    
+    dlg = ft.AlertDialog(
+        title=ft.Text("Добавьте тему для чата"),
+        content=ft.Column(
+            [
+                title,
+                desc,
+                ft.ElevatedButton(text="Добавить", on_click=create_topic),
+            ],
+            spacing=20,
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        ),
+        on_dismiss=lambda e: page.add(ft.Text("Non-modal dialog dismissed")),
+    )
+
+    chat = ft.ListView(
+        expand=True,
+        spacing=10,
+        auto_scroll=True,
+    )
+        
     return (ft.View(
         "/",
         [
@@ -19,25 +48,9 @@ def index(page: ft.Page):
                 actions=[
                 ft.PopupMenuButton(
                     items=[
-                        ft.ElevatedButton("Open dialog", on_click=open_dlg),
+                        ft.ElevatedButton("Создать тему", on_click=open_dlg),
                     ]
                 )]),
-            ft.Card(
-                content=ft.Container(
-                    content=ft.Column(
-                        [
-                            ft.ListTile(
-                                title=ft.Text("The Enchanted Nightingale"),
-                                subtitle=ft.Text(
-                                    "Music by Julie Gable. Lyrics by Sidney Stein."
-                                ),
-                            ),
-                        ]
-                    ),
-                    width='100%',
-                    padding=10,
-                    on_click=lambda _: page.go("/mess/The Enchanted Nightingale")
-                )
-            ),
+            chat
         ],
     ))

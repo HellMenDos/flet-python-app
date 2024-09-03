@@ -12,7 +12,7 @@ def mess(page: ft.Page):
 
     
     new_message = ft.TextField(
-        hint_text="Write a message...",
+        hint_text="Напиши свое сообщение...",
         autofocus=True,
         shift_enter=True,
         min_lines=1,
@@ -21,8 +21,11 @@ def mess(page: ft.Page):
         expand=True,
     )
 
+    async def add_message(e):
+        user_name = page.session.get("user_name")
+        chat.controls.append(ft.Text('{}: {}'.format(user_name,new_message.value)))
+        await e.control.page.update_async()
 
-    
     return (ft.View(
         "/mess",
         [
@@ -40,6 +43,7 @@ def mess(page: ft.Page):
                     ft.IconButton(
                         icon=ft.icons.SEND_ROUNDED,
                         tooltip="Send message",
+                        on_click=add_message
                     ),
                 ]
             ),    
