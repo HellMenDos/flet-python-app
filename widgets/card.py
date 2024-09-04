@@ -1,7 +1,6 @@
 import flet as ft
 
-def card_comp(page: ft.Page, title: str, desc: str):
-    
+def card_widget(page: ft.Page, title: str, desc: str):
     return (ft.Card(
                 content=ft.Container(
                     content=ft.Column(

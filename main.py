@@ -41,4 +41,4 @@ def main(page: ft.Page):
     page.go(page.route)
 
 
-ft.app(main)
+ft.app(main, view=ft.AppView.WEB_BROWSER)

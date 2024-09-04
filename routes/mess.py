@@ -1,6 +1,7 @@
     
 import flet as ft
 
+
 def mess(page: ft.Page):
     title = page.route.split('/')[2]
     
@@ -10,7 +11,6 @@ def mess(page: ft.Page):
         auto_scroll=True,
     )
 
-    
     new_message = ft.TextField(
         hint_text="Напиши свое сообщение...",
         autofocus=True,
@@ -20,12 +20,29 @@ def mess(page: ft.Page):
         filled=True,
         expand=True,
     )
+    
+    def on_message(message):
+        messages = page.session.get(title) if page.session.get(title) else []
+        message = ft.Text(f"{message.get('user','Unknown')}: {message.get('text','')}")
+        
+        page.session.set(title, [*messages, message])
+        chat.controls.append(message)
+        page.update()
 
-    async def add_message(e):
+
+    page.pubsub.subscribe(on_message)
+    def add_message(e):
         user_name = page.session.get("user_name")
-        chat.controls.append(ft.Text('{}: {}'.format(user_name,new_message.value)))
-        await e.control.page.update_async()
+        page.pubsub.send_all({ 
+            "user": user_name, 
+            "text": new_message.value ,
+        }),
+        new_message.value = ''
 
+
+    if page.session.get(title):
+        chat.controls = [*page.session.get(title)]
+        
     return (ft.View(
         "/mess",
         [
